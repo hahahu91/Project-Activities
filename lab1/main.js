@@ -1,5 +1,28 @@
 getWeekDay();
 
+const user = {};
+user.name = "Вася";
+user.surname = "Петров";
+console.log(user);
+user.name = "Сергей";
+console.log(user);
+delete user.name;
+console.log(user);
+
+const staff = {
+    "Вася": 23,
+    "Петя": 27,
+    "Даша": 22,
+}
+identifySenior(staff);
+
+const calculator = new Calculator();
+calculator.read();
+alert("Сумма = " + calculator.sum());
+alert("Произведение = " + calculator.mul());
+
+
+
 function getWeekDay() {
     const date = new Date();
     var weekDay = getWeekDayInString(date.getDay());
@@ -26,22 +49,6 @@ function getWeekDayInString(weekDay) {
           return 'Непонятный';
       }
 }
-
-const user = {};
-user.name = "Вася";
-user.surname = "Петров";
-console.log(user);
-user.name = "Сергей";
-console.log(user);
-delete user.name;
-console.log(user);
-
-const staff = {
-    "Вася": 23,
-    "Петя": 27,
-    "Даша": 22,
-}
-identifySenior(staff);
 
 function identifySenior(object){
     let senior = 0;
@@ -70,8 +77,3 @@ function Calculator() {
         return this.val1*this.val2;
     }
 }
-const calculator = new Calculator();
-calculator.read();
-
-alert("Сумма = " + calculator.sum());
-alert("Произведение = " + calculator.mul());
