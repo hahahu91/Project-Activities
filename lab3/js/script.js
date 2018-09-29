@@ -7,7 +7,7 @@ function main () {
     canvas.width = WIDTH;
 	canvas.height = HEIGHT;
     const ctx = canvas.getContext('2d');
-    const sun = new Sun(WIDTH, HEIGHT);
+    const sun = new Sun();
     const sky = new Sky();
     const clouds = [];
     const MAX_CLOUDS = 3;
@@ -29,21 +29,7 @@ function main () {
 
     animateFn();
 }
-function Sun(boxWidth,  boxHeight) {
-    this.x = boxWidth * 0.15;
-    this.y = boxHeight * HORIZONT_LINE;
-    this.moveSpeed = 1/4;
-};
 
-function Cloud({
-    startX,
-    startY,
-    moveSpeed,
-}) {
-    this.x = startX;
-    this.y = startY;
-    this.moveSpeed = moveSpeed;
-};
 
 function createClouds(boxWidth,  boxHeight) {
     const startX = Math.random() * boxWidth * 1.1;
@@ -55,6 +41,40 @@ function createClouds(boxWidth,  boxHeight) {
         moveSpeed,
     });
 };
+
+
+
+function update(sky, sun, clouds, boxWidth, boxHeight, dt) {
+    for (const cloud of clouds) {
+        moveCloud(cloud, boxWidth, boxHeight, dt);
+    }
+    moveSun(sun, dt);
+    recolorSky(sky, sun, dt);
+}
+
+function moveSun(sun, dt) {
+    const SUN_SPEED = Math.PI / 12;
+    const deltaAngle = SUN_SPEED * dt ;
+    
+    sun.angle -= deltaAngle;
+    if (sun.angle <= 0) sun.angle = Math.PI * 2;
+    //sun.angle %= Math.PI * 2;
+}
+
+function moveCloud(cloud, boxWidth, boxHeight, dt) {
+    const distance = cloud.moveSpeed * dt;
+    cloud.x -= distance;
+    if (cloud.x <= (-boxWidth * 0.08)) {
+        cloud.x = boxWidth * 1.08;
+    }
+    //cloud.y += distance;
+}
+
+function recolorSky(sky, sun, dt) {
+    const light = Math.cos(sun.angle)*(-45) + 45;
+    
+    sky.color.l = light;
+}
 
 function drawLand(ctx, WIDTH, HEIGHT) {
     ctx.fillStyle = '#27AE60';
@@ -104,41 +124,20 @@ function drawClouds(ctx, clouds) {
     };
 }
 
-function update(sky, sun, clouds, boxWidth, boxHeight, dt) {
-    for (const cloud of clouds) {
-        moveCloud(cloud, boxWidth, boxHeight, dt);
-    }
-    moveSun(sun, boxWidth, boxHeight, dt);
-    recolorSky(sky, dt);
-}
+function drawSun(ctx, boxWidth, boxHeight, sun) {
+    const SUN_ORBIT = 400;
+    const x = SUN_ORBIT * Math.sin(sun.angle) + boxWidth / 2;
+    const y = SUN_ORBIT * Math.cos(sun.angle) + boxHeight * HORIZONT_LINE;
 
-function moveSun(sun, boxWidth, boxHeight, dt) {
-    const timeDay = sun.moveSpeed * dt ;
-    const curStationSun = inRad(arctg360(sun.x - boxWidth / 2, sun.y - (boxHeight * HORIZONT_LINE))) + timeDay;
-    
-    sun.x = boxWidth / 2 + 400 * Math.cos(curStationSun);
-    sun.y = boxHeight * HORIZONT_LINE + 400 * Math.sin(curStationSun);
-}
-
-function moveCloud(cloud, boxWidth, boxHeight, dt) {
-    const distance = cloud.moveSpeed * dt;
-    cloud.x -= distance;
-    if (cloud.x <= -80 ) {
-        cloud.x = 1080;
-    }
-    //cloud.y += distance;
-}
-
-function drawSun(ctx, sun) {
-    ctx.fillStyle = '#F1C40F';
+    ctx.fillStyle = sun.color.toFillStyle();
     ctx.beginPath();
-    ctx.arc(sun.x, sun.y, 40, 0, Math.PI * 2, 0);
+    ctx.arc(x, y, 40, 0, Math.PI * 2, 0);
     ctx.fill();
 }
 
 function draw(ctx, WIDTH, HEIGHT, clouds, sun, sky) {
     drawSky(ctx, WIDTH, HEIGHT, sky);
-    drawSun(ctx, sun);
+    drawSun(ctx, WIDTH, HEIGHT, sun);
     drawClouds(ctx, clouds);
     drawLand(ctx, WIDTH, HEIGHT);
     drawHouse(ctx);
@@ -156,33 +155,32 @@ function drawCloud(ctx, x, y){
     ctx.fill();
 }
 
-function arctg360(x, y) {
-    if (y >= 0 && x >= 0) {
-        return Math.atan(y / x) * 180 / Math.PI;
-    }
-    else if (y >= 0 &&  x < 0 || y < 0 && x < 0) {
-        return 180 + Math.atan(y / x) * 180 / Math.PI;
-    }
-    else {
-        return 360 + Math.atan(y / x) * 180 / Math.PI;
-    };
-} 
+function Sun() {
+    this.angle = Math.PI;
+    hue = 58;
+    saturation = 100;
+    lightness = 54;
+    this.color = new HslColor({
+        hue,
+        saturation,
+        lightness,
+    });
+};
 
-
-function inRad(degrees){
-    return degrees * Math.PI / 180;
-}
-
-function inDeg(radians){
-    return radians * 180 / Math.PI;
-}
+function Cloud({
+    startX,
+    startY,
+    moveSpeed,
+}) {
+    this.x = startX;
+    this.y = startY;
+    this.moveSpeed = moveSpeed;
+};
 
 function Sky() {
     hue = 240;
     saturation = 100;
     lightness = 50;
-    this.am = true;
-    this.recolorSpeed = 1/4;
     this.color = new HslColor({
         hue,
         saturation,
@@ -207,13 +205,6 @@ function HslColor({
     }
 }
 
-function recolorSky(sky, dt) {
-    let am;
-    (sky.am) ? am = 1 : am = -1;
-    const light = Math.min(sky.color.l + am * sky.recolorSpeed * dt * 32, 100);
-    (light >= 100) && (sky.am = false);
-    (light <= 0) && (sky.am = true);
-    sky.color.l = light;
-}
+
 
 main();
