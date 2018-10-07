@@ -12,7 +12,7 @@ function main () {
     const clouds = [];
     const MAX_CLOUDS = 3;
     for (let i = 0; i < MAX_CLOUDS; ++i) {
-        clouds.push(createClouds(WIDTH, HEIGHT));
+        clouds.push(createCloud(WIDTH, HEIGHT));
     }
 
     draw(ctx, WIDTH, HEIGHT, clouds, sun, sky);
@@ -30,8 +30,7 @@ function main () {
     animateFn();
 }
 
-
-function createClouds(boxWidth,  boxHeight) {
+function createCloud(boxWidth,  boxHeight) {
     const startX = Math.random() * boxWidth * 1.1;
     const startY = Math.random() * boxHeight * 0.5 + 30;
     const moveSpeed = Math.random() * 100 + 20;
@@ -41,8 +40,6 @@ function createClouds(boxWidth,  boxHeight) {
         moveSpeed,
     });
 };
-
-
 
 function update(sky, sun, clouds, boxWidth, boxHeight, dt) {
     for (const cloud of clouds) {
@@ -71,9 +68,7 @@ function moveCloud(cloud, boxWidth, boxHeight, dt) {
 }
 
 function recolorSky(sky, sun, dt) {
-    const light = Math.cos(sun.angle)*(-45) + 45;
-    
-    sky.color.l = light;
+    sky.color.l = Math.cos(sun.angle)*(-45) + 45;
 }
 
 function drawLand(ctx, WIDTH, HEIGHT) {
@@ -204,7 +199,5 @@ function HslColor({
         return "hsl(" + h + "," + s + "%," + l + "%)";
     }
 }
-
-
 
 main();
