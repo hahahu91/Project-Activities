@@ -1,4 +1,4 @@
-getWeekDay();
+console.log(getWeekDay());
 
 const user = {};
 user.name = "Вася";
@@ -14,21 +14,22 @@ const staff = {
     "Петя": 27,
     "Даша": 22,
 }
-identifySenior(staff);
+
+var identifyS = identifySenior(staff);
+if (identifyS) {
+    console.log ("Самый старший сотрудник: ", identifyS);
+}
 
 const calculator = new Calculator();
 calculator.read();
 alert("Сумма = " + calculator.sum());
 alert("Произведение = " + calculator.mul());
 
-
-
 function getWeekDay() {
     const date = new Date();
-    var weekDay = getWeekDayInString(date.getDay());
-
-    alert(weekDay);
+    return getWeekDayInString(date.getDay());
 }
+
 function getWeekDayInString(weekDay) {
     switch(weekDay) {
         case 0: 
@@ -51,16 +52,23 @@ function getWeekDayInString(weekDay) {
 }
 
 function identifySenior(object){
-    let senior = 0;
-    for (const value of Object.values(object)) {
-       if (value > senior) {
-           senior = value;
-       }
-      }
-    for (const key of Object.keys(object)) {
-        if (object[key] == senior)
-            console.log('Самый старший сотрудник', key);
-       }  
+    if (Object.keys(object).length == 0) {
+        console.log('пуст');
+        return null;
+    } else  {
+        let senior = Object.values(object)[0];
+        console.log(senior);
+        for (const value of Object.values(object)) {
+            if (value > senior) {
+                senior = value;
+            }
+        }
+        for (const key of Object.keys(object)) {
+             if (object[key] == senior) {
+                return key;
+             }
+        }  
+    }
 }
 
 function Calculator() {
